@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="markdown_dom_parser.js"></script>
+		<script type="text/javascript" src="html2markdown.js"></script>
+		<title>html2markdown</title>
+	</head>
+
+	<body>
+		<div>
+			<div><label for="src">Source</label></div>
+			<textarea id="src" name="src" rows="30" cols="100"></textarea>
+		</div>
+		<div>
+			<label for="baseurl">Base URL</label>
+			<input type="text" id="baseurl" />
+			<label for="inlinestyle">Inline Style</label>
+			<input type="checkbox" name="inlinestyle" id="inlinestyle" checked="true" />
+			<button id="convert" onclick="convert()">Convert</button>
+		</div>
+		<div>
+			<textarea name="dest" id="dest" rows="30" cols="100"></textarea>
+		</div>
+		<script type="text/javascript">
+			function convert() {
+				var c1 = document.getElementById('src').value;
+				var inlineStyle = document.getElementById('inlinestyle').checked;
+				var baseUrl = document.getElementById('baseurl').value;
+				
+				c1 = html2markdown(c1, {
+					inlineStyle: inlineStyle,
+					baseUrl: baseUrl,
+				});
+				var d1 = document.getElementById('dest');
+				d1.innerHTML = c1;
+			}
+		</script>
+
+	</body>
+
+</html>

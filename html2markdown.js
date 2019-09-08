@@ -64,6 +64,7 @@ function html2markdown(html, opts) {
 	var links = [];
 	var inlineStyle = opts['inlineStyle'] || false;
 	var parser = opts['parser'];
+	var baseUrl= opts['baseUrl']||'';
 	var markdownTags = {
 		"hr": "- - -\n\n",
 		"br": "  \n",
@@ -194,6 +195,20 @@ function html2markdown(html, opts) {
 			nodeList.push("\n");
 		}
 	}
+	function addBaseUrlIfNecessary(origin){
+		//absolute url don't change
+		if(origin=="" || baseUrl=="" ||
+			origin.indexOf("http://")==0 ||
+			origin.indexOf("https://")==0 ||
+			origin.indexOf("//")==0 ||
+			origin.indexOf("#")==0)
+			return origin; 
+		if(URL){
+			console.log(origin+" "+baseUrl);
+			return new URL(origin, baseUrl).href;
+		}
+		return baseUrl+origin;
+	}
 
 	parser(html, {
 		start: function(tag, attrs, unary) {
@@ -283,7 +298,7 @@ function html2markdown(html, opts) {
 				if (!inlineStyle && !startsWith(peekTillNotEmpty(nodeList), "[")) {
 					var l = links.indexOf(url);
 					if (l == -1) {
-						links.push(url);
+						links.push(addBaseUrlIfNecessary(url));
 						l=links.length-1;
 					}
 
@@ -303,7 +318,7 @@ function html2markdown(html, opts) {
 						block();
 					}
 
-					nodeList.push("![" + alt + "](" + url + (title ? " \"" + title + "\"" : "") + ")");
+					nodeList.push("![" + alt + "](" + addBaseUrlIfNecessary(url) + (title ? " \"" + title + "\"" : "") + ")");
 
 					if (!startsWith(peekTillNotEmpty(nodeList), "[")) {
 						block(true);
@@ -422,7 +437,7 @@ function html2markdown(html, opts) {
 				if (!inlineStyle && !startsWith(peek(nodeList), "!")){
 					var l = links.indexOf(url);
 					if (l == -1) {
-						links.push(url);
+						links.push(addBaseUrlIfNecessary(url));
 						l=links.length-1;
 					}
 					nodeList.push("][" + l + "]");
@@ -435,7 +450,7 @@ function html2markdown(html, opts) {
 					}
 
 					var title = attrs["title"];
-					nodeList.push("](" + url + (title ? " \"" + trim(title.value).replace(/\s+/g, " ") + "\"" : "") + ")");
+					nodeList.push("](" + addBaseUrlIfNecessary(url) + (title ? " \"" + trim(title.value).replace(/\s+/g, " ") + "\"" : "") + ")");
 
 					if(startsWith(peek(nodeList), "!")){
 						block(true);
